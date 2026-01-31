@@ -1,6 +1,6 @@
 name: Build Mod Artifact
 
-on: [push] # 每次 git push 都会触发
+on: [push]
 
 jobs:
   build:
@@ -16,18 +16,20 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
+      # 新增这一步：直接预装 Gradle，不让它去联网下载 .zip
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: 8.5 
 
       - name: Build with Gradle
-        # --no-daemon 节省内存
-        # --stacktrace 出错时显示详细信息
-        run: ./gradlew build --no-daemon 
+        # 关键修改：去掉 ./ 前缀，直接使用上面 Setup 好的系统 gradle
+        run: gradle build --no-daemon --stacktrace
 
       - name: Capture Build Artifacts
+        if: success() # 只有成功才上传
         uses: actions/upload-artifact@v4
         with:
           name: MyMod-Jars
-          # 只要上传 jar 包，忽略其他的
           path: build/libs/*.jar
           if-no-files-found: error
