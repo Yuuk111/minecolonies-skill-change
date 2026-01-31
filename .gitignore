@@ -1,0 +1,10 @@
+# 忽略垃圾和缓存
+.gradle/
+build/
+bin/
+out/
+run/
+.vscode/
+.idea/
+*.iml
+logs/

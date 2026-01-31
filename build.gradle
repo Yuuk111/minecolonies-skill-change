@@ -1,0 +1,79 @@
+plugins {
+    id 'net.minecraftforge.gradle' version '6.0.24'
+}
+
+group = project.findProperty('mod_group')
+version = project.findProperty('mod_version')
+
+base {
+    archivesName = project.findProperty('mod_id')
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+repositories {
+    // 1. 优先使用阿里云镜像（下载常规 Java 依赖）
+    maven { url 'https://maven.aliyun.com/repository/public/' }
+    
+    // 2. 使用 BMCLAPI 镜像（下载 Minecraft 和 Forge 专属文件）
+    maven { url 'https://bmclapi2.bangbang93.com/maven' }
+    
+    // 3. 原版配置（作为备用放最后）
+    mavenLocal()
+    maven {
+        // Forge 官方源
+        name = "Forge"
+        url = "https://maven.minecraftforge.net/"
+    }
+}
+minecraft {
+    mappings channel: 'official', version: project.findProperty('minecraft_version')
+
+    runs {
+        client {
+            workingDirectory project.file('run')
+            property 'forge.logging.console.level', 'info'
+            mods {
+                "${project.findProperty('mod_id')}" {
+                    source sourceSets.main
+                }
+            }
+        }
+
+        server {
+            workingDirectory project.file('run')
+            property 'forge.logging.console.level', 'info'
+            mods {
+                "${project.findProperty('mod_id')}" {
+                    source sourceSets.main
+                }
+            }
+        }
+    }
+}
+
+dependencies {
+    minecraft "net.minecraftforge:forge:${project.findProperty('minecraft_version')}-${project.findProperty('forge_version')}"
+
+    compileOnly fg.deobf("${project.findProperty('minecolonies_maven_group')}:minecolonies:${project.findProperty('minecolonies_version')}")
+}
+
+def resourceProps = [
+        mod_id: project.findProperty('mod_id'),
+        mod_name: project.findProperty('mod_name'),
+        mod_version: project.findProperty('mod_version'),
+        minecraft_version: project.findProperty('minecraft_version'),
+        forge_version: project.findProperty('forge_version'),
+        minecolonies_version: project.findProperty('minecolonies_version')
+]
+
+processResources {
+    inputs.properties resourceProps
+    filesMatching('META-INF/mods.toml') {
+        expand resourceProps
+    }
+}
