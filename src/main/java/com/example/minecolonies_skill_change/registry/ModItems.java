@@ -21,8 +21,16 @@ public final class ModItems
 
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, SkillChangeMod.MODID);
 
-    public static final RegistryObject<Item> SKILL_TUNER = ITEMS.register("skill_tuner", SkillTunerItem::new);
-
+    //30-50
+    public static final RegistryObject<Item> KNOWLEDGE_SCROLL_FAINT = ITEMS.register("knowledge_scroll_faint", () -> new SkillTunerItem(30, 50));
+    //50-70
+    public static final RegistryObject<Item> KNOWLEDGE_SCROLL_DIM = ITEMS.register("knowledge_scroll_dim", () -> new SkillTunerItem(50, 70));
+    //70-80
+    public static final RegistryObject<Item> KNOWLEDGE_SCROLL_MELLOW = ITEMS.register("knowledge_scroll_mellow", () -> new SkillTunerItem(70, 80));
+    //80-90
+    public static final RegistryObject<Item> KNOWLEDGE_SCROLL_VIVID = ITEMS.register("knowledge_scroll_vivid", () -> new SkillTunerItem(80, 90));
+    //90-99
+    public static final RegistryObject<Item> KNOWLEDGE_SCROLL_INTENSE = ITEMS.register("knowledge_scroll_intense", () -> new SkillTunerItem(90, 99));
     public static void register(final IEventBus modEventBus)
     {
         ITEMS.register(modEventBus);
@@ -33,7 +41,11 @@ public final class ModItems
     {
         if (event.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES)
         {
-            event.accept(SKILL_TUNER.get());
+            event.accept(KNOWLEDGE_SCROLL_FAINT.get());
+            event.accept(KNOWLEDGE_SCROLL_DIM.get());
+            event.accept(KNOWLEDGE_SCROLL_MELLOW.get());
+            event.accept(KNOWLEDGE_SCROLL_VIVID.get());
+            event.accept(KNOWLEDGE_SCROLL_INTENSE.get());
         }
     }
 }

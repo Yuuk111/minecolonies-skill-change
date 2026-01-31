@@ -23,10 +23,15 @@ import java.util.List;
 public class SkillTunerItem extends Item
 {
     private static final String NBT_SKILL = "SelectedSkill";
-
-    public SkillTunerItem()
+//    private final Skill targetSkill;
+    private final int minLevel;
+    private final int maxLevel;
+    public SkillTunerItem(int minLevel,int maxLevel)
     {
-        super(new Item.Properties().stacksTo(1));
+        super(new Item.Properties().stacksTo(16));
+//        this.targetSkill = targetSkill;
+        this.minLevel = minLevel;
+        this.maxLevel = maxLevel;
     }
 
     /*
@@ -65,7 +70,6 @@ public class SkillTunerItem extends Item
             if (!player.level().isClientSide)
             {
 
-//                final ICitizenDataView dataView = citizenEntity.getCitizenDataView();
                 final ICitizenData citizenData = citizenEntity.getCitizenData();
 
                 if(citizenData != null)
@@ -73,9 +77,14 @@ public class SkillTunerItem extends Item
                     final ICitizenSkillHandler handler = citizenData.getCitizenSkillHandler();
 
                     int currentLevel = handler.getLevel(selected);
-                    if (currentLevel < 30 )
+                    if (currentLevel < this.minLevel )
                     {
-                        player.sendSystemMessage(Component.literal("This citizen is toooooo weak!!!"));
+                        player.sendSystemMessage(Component.literal("The knowledge in the scroll was too hard for this people,maybe you should send this people to school?"));
+                        return true;
+                    }
+                    if (currentLevel >= this.maxLevel)
+                    {
+                        player.sendSystemMessage(Component.literal("The people has fully grasped the knowledge in the scroll,unuseful to it"));
                         return true;
                     }
                     handler.incrementLevel(selected, delta);
@@ -87,7 +96,9 @@ public class SkillTunerItem extends Item
                         stack.shrink(1);
                     }
 
-                    final var colony = citizenData.getColony();
+                    syncToClient(citizenData);
+
+                    /*final var colony = citizenData.getColony();
                     if (colony != null)
                     {
 
@@ -97,7 +108,7 @@ public class SkillTunerItem extends Item
                             cpm.setDirty();
                             colony.getCitizenManager().sendPackets(cpm.getCloseSubscribers(), new java.util.HashSet<>());
                         }
-                    }
+                    }*/
 
                     player.sendSystemMessage(Component.literal("[+uki+] this citizen is more smart~~~ "+selected.name()));
 //                    Network.getNetwork().sendToServer(new AdjustSkillCitizenMessage(colony,dataView,delta,selected));
@@ -110,6 +121,21 @@ public class SkillTunerItem extends Item
             return true;
         }
         return false;
+    }
+
+    private void syncToClient(ICitizenData data)
+    {
+        final var colony = data.getColony();
+        if (colony != null)
+        {
+
+            final var pm = colony.getPackageManager();
+            if (pm instanceof com.minecolonies.core.colony.managers.ColonyPackageManager cpm)
+            {
+                cpm.setDirty();
+                colony.getCitizenManager().sendPackets(cpm.getCloseSubscribers(), new java.util.HashSet<>());
+            }
+        }
     }
 
     @Override
