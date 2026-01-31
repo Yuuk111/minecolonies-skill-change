@@ -16,20 +16,26 @@ java {
 }
 
 repositories {
-    // 1. 优先使用阿里云镜像（下载常规 Java 依赖）
-    maven { url 'https://maven.aliyun.com/repository/public/' }
+    mavenLocal() 
     
-    // 2. 使用 BMCLAPI 镜像（下载 Minecraft 和 Forge 专属文件）
-    maven { url 'https://bmclapi2.bangbang93.com/maven' }
-    
-    // 3. 原版配置（作为备用放最后）
-    mavenLocal()
+    // Forge 官方仓库
+    maven { url = 'https://maven.minecraftforge.net/' }
+
+    // MineColonies 和 LDTTeam 必备仓库
     maven {
-        // Forge 官方源
-        name = "Forge"
-        url = "https://maven.minecraftforge.net/"
+        name = "LDTTeam"
+        url = "https://ldtteam.jfrog.io/ldtteam/modding/"
     }
+
+    // 很多模组需要的 CurseMaven 
+    maven {
+        url = "https://www.cursemaven.com"
+        content { includeGroup "curse.maven" }
+    }
+    
+    mavenCentral()
 }
+
 minecraft {
     mappings channel: 'official', version: project.findProperty('minecraft_version')
 
