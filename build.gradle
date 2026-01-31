@@ -75,7 +75,9 @@ minecraft {
 dependencies {
     minecraft "net.minecraftforge:forge:${project.findProperty('minecraft_version')}-${project.findProperty('forge_version')}"
 
-    compileOnly fg.deobf("${project.findProperty('minecolonies_maven_group')}:minecolonies:${project.findProperty('minecolonies_version')}")
+    // 使用 CurseMaven 格式：curse.maven:<项目名>-<项目ID>:<文件ID>
+    // 注意：fg.deobf 是必须的，否则你会得到混淆过的 Jar 包导致编译失败
+    implementation fg.deobf("curse.maven:minecolonies-245506:7425051")
 }
 
 def resourceProps = [
