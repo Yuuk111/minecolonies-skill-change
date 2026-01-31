@@ -1,0 +1,33 @@
+name: Build Mod Artifact
+
+on: [push] # 每次 git push 都会触发
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build with Gradle
+        # --no-daemon 节省内存
+        # --stacktrace 出错时显示详细信息
+        run: ./gradlew build --no-daemon 
+
+      - name: Capture Build Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: MyMod-Jars
+          # 只要上传 jar 包，忽略其他的
+          path: build/libs/*.jar
+          if-no-files-found: error
