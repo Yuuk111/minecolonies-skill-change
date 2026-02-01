@@ -4,7 +4,7 @@ license="All Rights Reserved"
 
 [[mods]]
 modId="minecolonies_skill_change"
-version="1.0.0"
+version="${mod_version}"
 displayName="MineColonies Skill Change"
 description='''
 Adjust MineColonies citizen skills with an item.
