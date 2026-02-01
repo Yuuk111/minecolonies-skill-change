@@ -7,8 +7,10 @@ import com.minecolonies.api.colony.ICitizenData;
 import com.minecolonies.api.entity.citizen.Skill;
 import com.minecolonies.api.entity.citizen.citizenhandlers.ICitizenSkillHandler;
 import com.minecolonies.core.entity.citizen.EntityCitizen;
+import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -19,6 +21,7 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public class SkillTunerItem extends Item
 {
@@ -57,7 +60,7 @@ public class SkillTunerItem extends Item
     {
         if (target instanceof net.minecraft.world.entity.animal.Pig)
         {
-            player.displayClientMessage(Component.literal("Don't attack llm"), true);
+            player.displayClientMessage(Component.literal("§9 不要喂给llm,他看不懂啊！"), true);
         }
 
         if (target instanceof EntityCitizen citizenEntity)
@@ -79,12 +82,12 @@ public class SkillTunerItem extends Item
                     int currentLevel = handler.getLevel(selected);
                     if (currentLevel < this.minLevel )
                     {
-                        player.sendSystemMessage(Component.literal("The knowledge in the scroll was too hard for this people,maybe you should send this people to school?"));
+                        player.sendSystemMessage(Component.literal("这份卷轴里的知识或许对他来说太深奥了，或许他应该先去扫个盲？"));
                         return true;
                     }
                     if (currentLevel >= this.maxLevel)
                     {
-                        player.sendSystemMessage(Component.literal("The people has fully grasped the knowledge in the scroll,unuseful to it"));
+                        player.sendSystemMessage(Component.literal("这个人已经完全理解这份卷轴里的知识了，对他来说没用了~"));
                         return true;
                     }
                     handler.incrementLevel(selected, delta);
@@ -110,7 +113,7 @@ public class SkillTunerItem extends Item
                         }
                     }*/
 
-                    player.sendSystemMessage(Component.literal("[+uki+] this citizen is more smart~~~ "+selected.name()));
+                    player.sendSystemMessage(Component.literal("[+uki+] 这个居民变得更有智慧了~~~ "+selected.name()));
 //                    Network.getNetwork().sendToServer(new AdjustSkillCitizenMessage(colony,dataView,delta,selected));
                 }
             }
@@ -141,11 +144,50 @@ public class SkillTunerItem extends Item
     @Override
     public void appendHoverText(final ItemStack stack, final Level level, final List<Component> tooltip, final TooltipFlag flag)
     {
+        tooltip.add(Component.literal("§e 这份卷轴可以让你的居民变得更聪明~"));
+        tooltip.add(Component.literal("§e 适用区间: §b" + this.minLevel + "---" + this.maxLevel));
+        /*
+        * 以卷轴等级来判断稀有度描述*/
+        MutableComponent flavorText = Component.literal("");
+        if(this.maxLevel <= 50)
+        {
+            //30-50:Faint - 灰色
+            flavorText = Component.literal("微弱的光芒闪烁，适合入门者。");
+            flavorText.withStyle(ChatFormatting.GRAY);
+        }
+        else if(this.maxLevel <= 70)
+        {
+            //50-70:Dim - 绿色
+            flavorText = Component.literal("隐约可见的符文，蕴含进阶知识。");
+            flavorText.withStyle(ChatFormatting.DARK_GREEN);
+        }
+        else if(this.maxLevel <= 80)
+        {
+            //70-80:Mellow - 青色
+            flavorText = Component.literal("柔和而稳定的能量，专家之选。");
+            flavorText.withStyle(ChatFormatting.AQUA);
+        }
+        else if(this.maxLevel <= 90)
+        {
+            //80-90:Vivid - 紫色
+            flavorText = Component.literal("生动的智慧跃然纸上，大师珍藏。");
+            flavorText.withStyle(ChatFormatting.LIGHT_PURPLE);
+        }
+        else if(this.maxLevel <= 99)
+        {
+            //90-99:Intense - 金色
+            flavorText = Component.literal("强烈的力量仿佛要撕裂卷轴，传说级！");
+            flavorText.withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD);
+        }
+
+        tooltip.add(flavorText);
+
         /*final Skill selected = getSelectedSkill(stack);
         tooltip.add(Component.literal("Selected skill: " + selected.name()));
         tooltip.add(Component.literal("Right click air to cycle (sneak reverses)."));
         tooltip.add(Component.literal("Right click citizen to adjust (sneak lowers)."));*/
-        tooltip.add(Component.literal("LeftClick your citizen to make them It up 1"));
+
+        tooltip.add(Component.literal("对着你的居民左键以提升他的属性"));
     }
 
     private static Skill getSelectedSkill(final ItemStack stack)
